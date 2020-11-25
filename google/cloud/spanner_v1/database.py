@@ -127,9 +127,7 @@ class Database(object):
         self._earliest_version_time = None
 
         if type(encryption_config) == dict:
-            self._encryption_config = EncryptionConfig(
-                kms_key_name=encryption_config["kms_key_name"]
-            )
+            self._encryption_config = EncryptionConfig(**encryption_config)
         else:
             self._encryption_config = encryption_config
 
