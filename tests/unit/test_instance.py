@@ -488,6 +488,7 @@ class TestInstance(unittest.TestCase):
         self.assertIs(pool._database, database)
 
     def test_database_factory_explicit(self):
+        from google.cloud.spanner_admin_database_v1 import EncryptionConfig
         from google.cloud.spanner_v1.database import Database
         from tests._fixtures import DDL_STATEMENTS
 
@@ -495,9 +496,13 @@ class TestInstance(unittest.TestCase):
         instance = self._make_one(self.INSTANCE_ID, client, self.CONFIG_NAME)
         DATABASE_ID = "database-id"
         pool = _Pool()
+        encryption_config = EncryptionConfig(kms_key_name="kms_key")
 
         database = instance.database(
-            DATABASE_ID, ddl_statements=DDL_STATEMENTS, pool=pool
+            DATABASE_ID,
+            ddl_statements=DDL_STATEMENTS,
+            pool=pool,
+            encryption_config=encryption_config,
         )
 
         self.assertIsInstance(database, Database)
@@ -506,6 +511,7 @@ class TestInstance(unittest.TestCase):
         self.assertEqual(list(database.ddl_statements), DDL_STATEMENTS)
         self.assertIs(database._pool, pool)
         self.assertIs(pool._bound, database)
+        self.assertIs(database._encryption_config, encryption_config)
 
     def test_list_databases(self):
         from google.cloud.spanner_admin_database_v1 import Database as DatabasePB

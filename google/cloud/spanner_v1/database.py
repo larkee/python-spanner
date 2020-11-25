@@ -46,6 +46,7 @@ from google.cloud.spanner_v1.services.spanner.transports.grpc import (
     SpannerGrpcTransport,
 )
 from google.cloud.spanner_admin_database_v1 import CreateDatabaseRequest
+from google.cloud.spanner_admin_database_v1 import EncryptionConfig
 from google.cloud.spanner_admin_database_v1 import UpdateDatabaseDdlRequest
 from google.cloud.spanner_v1 import ExecuteSqlRequest
 from google.cloud.spanner_v1 import (
@@ -95,11 +96,26 @@ class Database(object):
     :param pool: (Optional) session pool to be used by database.  If not
                  passed, the database will construct an instance of
                  :class:`~google.cloud.spanner_v1.pool.BurstyPool`.
+
+    :type encryption_config:
+        :class:`~google.cloud.spanner_admin_database_v1.types.EncryptionConfig`
+        or :class:`dict`
+    :param encryption_config:
+        (Optional) Encryption information about the database.
+        If a dict is provided, it must be of the same form as the protobuf
+        message :class:`~google.cloud.spanner_admin_database_v1.types.EncryptionConfig`
     """
 
     _spanner_api = None
 
-    def __init__(self, database_id, instance, ddl_statements=(), pool=None):
+    def __init__(
+            self,
+            database_id,
+            instance,
+            ddl_statements=(),
+            pool=None,
+            encryption_config=None,
+    ):
         self.database_id = database_id
         self._instance = instance
         self._ddl_statements = _check_ddl_statements(ddl_statements)
@@ -109,6 +125,13 @@ class Database(object):
         self._restore_info = None
         self._version_retention_period = None
         self._earliest_version_time = None
+
+        if type(encryption_config) == dict:
+            self._encryption_config = EncryptionConfig(
+                kms_key_name=encryption_config["kms_key_name"]
+            )
+        else:
+            self._encryption_config = encryption_config
 
         if pool is None:
             pool = BurstyPool()
@@ -226,6 +249,14 @@ class Database(object):
         return self._earliest_version_time
 
     @property
+    def encryption_config(self):
+        """Encryption config for this database.
+        :rtype: :class:`~google.cloud.spanner_admin_instance_v1.proto.common_pb2.EncryptionConfig`
+        :returns: an object representing the restore info for this database
+        """
+        return self._encryption_config
+
+    @property
     def ddl_statements(self):
         """DDL Statements used to define database schema.
 
@@ -334,6 +365,7 @@ class Database(object):
         self._state = DatabasePB.State(response.state)
         self._create_time = response.create_time
         self._restore_info = response.restore_info
+        self._encryption_config = response.encryption_config
         self._version_retention_period = response.version_retention_period
         self._earliest_version_time = response.earliest_version_time
 
