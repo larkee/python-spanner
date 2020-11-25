@@ -28,6 +28,7 @@ __protobuf__ = proto.module(
     package="google.spanner.admin.database.v1",
     manifest={
         "Backup",
+        "CreateBackupEncryptionConfig",
         "CreateBackupRequest",
         "CreateBackupMetadata",
         "UpdateBackupRequest",
@@ -38,7 +39,6 @@ __protobuf__ = proto.module(
         "ListBackupOperationsRequest",
         "ListBackupOperationsResponse",
         "BackupInfo",
-        "CreateBackupEncryptionConfig",
     },
 )
 
