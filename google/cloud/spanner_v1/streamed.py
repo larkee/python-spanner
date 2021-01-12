@@ -99,10 +99,11 @@ class StreamedResultSet(object):
         :type values: list of :class:`~google.protobuf.struct_pb2.Value`
         :param values: non-chunked values from partial result set.
         """
-        width = len(self.fields)
+        fields = self.fields
+        width = len(fields)
         for value in values:
             index = len(self._current_row)
-            field = self.fields[index]
+            field = fields[index]
             self._current_row.append(_parse_value_pb(value, field.type))
             if len(self._current_row) == width:
                 self._rows.append(self._current_row)
@@ -136,16 +137,14 @@ class StreamedResultSet(object):
         self._merge_values(values)
 
     def __iter__(self):
-        iter_rows, self._rows[:] = self._rows[:], ()
         while True:
-            if not iter_rows:
-                try:
-                    self._consume_next()
-                except StopIteration:
-                    return
-                iter_rows, self._rows[:] = self._rows[:], ()
+            iter_rows, self._rows[:] = self._rows[:], ()
             while iter_rows:
                 yield iter_rows.pop(0)
+            try:
+                self._consume_next()
+            except StopIteration:
+                return
 
     def one(self):
         """Return exactly one result, or raise an exception.

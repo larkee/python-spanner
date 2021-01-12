@@ -171,32 +171,33 @@ def _parse_value_pb(value_pb, field_type):
     :returns: value extracted from value_pb
     :raises ValueError: if unknown type is passed
     """
+    type_code = field_type.code
     if value_pb.HasField("null_value"):
         return None
-    if field_type.code == type_pb2.STRING:
+    if type_code == type_pb2.STRING:
         result = value_pb.string_value
-    elif field_type.code == type_pb2.BYTES:
+    elif type_code == type_pb2.BYTES:
         result = value_pb.string_value.encode("utf8")
-    elif field_type.code == type_pb2.BOOL:
+    elif type_code == type_pb2.BOOL:
         result = value_pb.bool_value
-    elif field_type.code == type_pb2.INT64:
+    elif type_code == type_pb2.INT64:
         result = int(value_pb.string_value)
-    elif field_type.code == type_pb2.FLOAT64:
+    elif type_code == type_pb2.FLOAT64:
         if value_pb.HasField("string_value"):
             result = float(value_pb.string_value)
         else:
             result = value_pb.number_value
-    elif field_type.code == type_pb2.DATE:
+    elif type_code == type_pb2.DATE:
         result = _date_from_iso8601_date(value_pb.string_value)
-    elif field_type.code == type_pb2.TIMESTAMP:
+    elif type_code == type_pb2.TIMESTAMP:
         DatetimeWithNanoseconds = datetime_helpers.DatetimeWithNanoseconds
         result = DatetimeWithNanoseconds.from_rfc3339(value_pb.string_value)
-    elif field_type.code == type_pb2.ARRAY:
+    elif type_code == type_pb2.ARRAY:
         result = [
             _parse_value_pb(item_pb, field_type.array_element_type)
             for item_pb in value_pb.list_value.values
         ]
-    elif field_type.code == type_pb2.STRUCT:
+    elif type_code == type_pb2.STRUCT:
         result = [
             _parse_value_pb(item_pb, field_type.struct_type.fields[i].type)
             for (i, item_pb) in enumerate(value_pb.list_value.values)
