@@ -98,15 +98,16 @@ class StreamedResultSet(object):
         :type values: list of :class:`~google.protobuf.struct_pb2.Value`
         :param values: non-chunked values from partial result set.
         """
-        fields = self.fields
-        width = len(fields)
+        field_types = [field.type for field in self.fields]
+        width = len(field_types)
+        index = len(self._current_row)
         for value in values:
-            index = len(self._current_row)
-            field = fields[index]
-            self._current_row.append(_parse_value_pb(value, field.type))
-            if len(self._current_row) == width:
+            self._current_row.append(_parse_value_pb(value, field_types[index]))
+            index += 1
+            if index == width:
                 self._rows.append(self._current_row)
                 self._current_row = []
+                index = 0
 
     def _consume_next(self):
         """Consume the next partial result set from the stream.
