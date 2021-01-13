@@ -175,36 +175,35 @@ def _parse_value_pb(value_pb, field_type):
     if value_pb.HasField("null_value"):
         return None
     if type_code == type_pb2.STRING:
-        result = value_pb.string_value
+        return value_pb.string_value
     elif type_code == type_pb2.BYTES:
-        result = value_pb.string_value.encode("utf8")
+        return value_pb.string_value.encode("utf8")
     elif type_code == type_pb2.BOOL:
-        result = value_pb.bool_value
+        return value_pb.bool_value
     elif type_code == type_pb2.INT64:
-        result = int(value_pb.string_value)
+        return int(value_pb.string_value)
     elif type_code == type_pb2.FLOAT64:
         if value_pb.HasField("string_value"):
-            result = float(value_pb.string_value)
+            return float(value_pb.string_value)
         else:
-            result = value_pb.number_value
+            return value_pb.number_value
     elif type_code == type_pb2.DATE:
-        result = _date_from_iso8601_date(value_pb.string_value)
+        return _date_from_iso8601_date(value_pb.string_value)
     elif type_code == type_pb2.TIMESTAMP:
         DatetimeWithNanoseconds = datetime_helpers.DatetimeWithNanoseconds
-        result = DatetimeWithNanoseconds.from_rfc3339(value_pb.string_value)
+        return DatetimeWithNanoseconds.from_rfc3339(value_pb.string_value)
     elif type_code == type_pb2.ARRAY:
-        result = [
+        return [
             _parse_value_pb(item_pb, field_type.array_element_type)
             for item_pb in value_pb.list_value.values
         ]
     elif type_code == type_pb2.STRUCT:
-        result = [
+        return [
             _parse_value_pb(item_pb, field_type.struct_type.fields[i].type)
             for (i, item_pb) in enumerate(value_pb.list_value.values)
         ]
     else:
         raise ValueError("Unknown type: %s" % (field_type,))
-    return result
 
 
 # pylint: enable=too-many-branches
