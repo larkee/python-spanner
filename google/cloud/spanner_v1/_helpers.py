@@ -165,35 +165,34 @@ def _parse_value(value, field_type):
     if value is None:
         return None
     if field_type.code == TypeCode.STRING:
-        result = value
+        return value
     elif field_type.code == TypeCode.BYTES:
-        result = value.encode("utf8")
+        return value.encode("utf8")
     elif field_type.code == TypeCode.BOOL:
-        result = value
+        return value
     elif field_type.code == TypeCode.INT64:
-        result = int(value)
+        return int(value)
     elif field_type.code == TypeCode.FLOAT64:
         if isinstance(value, str):
-            result = float(value)
+            return float(value)
         else:
-            result = value
+            return value
     elif field_type.code == TypeCode.DATE:
-        result = _date_from_iso8601_date(value)
+        return _date_from_iso8601_date(value)
     elif field_type.code == TypeCode.TIMESTAMP:
         DatetimeWithNanoseconds = datetime_helpers.DatetimeWithNanoseconds
-        result = DatetimeWithNanoseconds.from_rfc3339(value)
+        return DatetimeWithNanoseconds.from_rfc3339(value)
     elif field_type.code == TypeCode.ARRAY:
-        result = [_parse_value(item, field_type.array_element_type) for item in value]
+        return [_parse_value(item, field_type.array_element_type) for item in value]
     elif field_type.code == TypeCode.STRUCT:
-        result = [
+        return [
             _parse_value(item, field_type.struct_type.fields[i].type_)
             for (i, item) in enumerate(value)
         ]
     elif field_type.code == TypeCode.NUMERIC:
-        result = decimal.Decimal(value)
+        return decimal.Decimal(value)
     else:
         raise ValueError("Unknown type: %s" % (field_type,))
-    return result
 
 
 def _parse_value_pb(value_pb, field_type):
