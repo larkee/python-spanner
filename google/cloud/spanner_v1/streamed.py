@@ -85,10 +85,10 @@ class StreamedResultSet(object):
         :returns: the merged value
         """
         current_column = len(self._current_row)
-        field = self.fields[current_column]
-        merged = _merge_by_type(self._pending_chunk, value, field.type_)
+        field_type = self.fields[current_column].type_
+        merged = _merge_by_type(self._pending_chunk, value, field_type)
         self._pending_chunk = None
-        return _parse_value(merged, field.type_)
+        return _parse_value(merged, field_type)
 
     def _merge_values(self, values):
         """Merge values into rows.
@@ -96,14 +96,16 @@ class StreamedResultSet(object):
         :type values: list of :class:`~google.protobuf.struct_pb2.Value`
         :param values: non-chunked values from partial result set.
         """
-        width = len(self.fields)
+        field_types = [field.type_ for field in self.fields]
+        width = len(field_types)
+        index = len(self._current_row)
         for value in values:
-            index = len(self._current_row)
-            field = self.fields[index]
-            self._current_row.append(_parse_value(value, field.type_))
-            if len(self._current_row) == width:
+            self._current_row.append(_parse_value(value, field_types[index]))
+            index += 1
+            if index == width:
                 self._rows.append(self._current_row)
                 self._current_row = []
+                index = 0
 
     def _consume_next(self):
         """Consume the next partial result set from the stream.
