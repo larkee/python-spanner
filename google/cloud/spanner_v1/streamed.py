@@ -306,6 +306,7 @@ _MERGE_BY_TYPE = {
     type_pb2.STRING: _merge_string,
     type_pb2.STRUCT: _merge_struct,
     type_pb2.TIMESTAMP: _merge_string,
+    type_pb2.NUMERIC: _merge_string,
 }
 
 
