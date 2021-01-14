@@ -206,7 +206,7 @@ def _parse_value_pb(value_pb, field_type):
             for (i, item_pb) in enumerate(value_pb.list_value.values)
         ]
     elif field_type.code == type_pb2.NUMERIC:
-        result = decimal.Decimal(value_pb.string_value)
+        return decimal.Decimal(value_pb.string_value)
     else:
         raise ValueError("Unknown type: %s" % (field_type,))
 
