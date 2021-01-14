@@ -134,16 +134,14 @@ class StreamedResultSet(object):
         self._merge_values(values)
 
     def __iter__(self):
-        iter_rows, self._rows[:] = self._rows[:], ()
         while True:
-            if not iter_rows:
-                try:
-                    self._consume_next()
-                except StopIteration:
-                    return
-                iter_rows, self._rows[:] = self._rows[:], ()
+            iter_rows, self._rows[:] = self._rows[:], ()
             while iter_rows:
                 yield iter_rows.pop(0)
+            try:
+                self._consume_next()
+            except StopIteration:
+                return
 
     def one(self):
         """Return exactly one result, or raise an exception.
