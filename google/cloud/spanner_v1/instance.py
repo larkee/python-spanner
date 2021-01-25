@@ -358,7 +358,7 @@ class Instance(object):
         api.delete_instance(name=self.name, metadata=metadata)
 
     def database(
-            self, database_id, ddl_statements=(), pool=None, encryption_config=None
+        self, database_id, ddl_statements=(), pool=None, encryption_config=None
     ):
         """Factory to create a database within this instance.
 

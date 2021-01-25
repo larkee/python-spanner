@@ -170,7 +170,6 @@ class TestDatabase(_BaseTest):
         self.assertIs(database._instance, instance)
         self.assertEqual(database._encryption_config, encryption_config)
 
-
     def test_from_pb_bad_database_name(self):
         from google.cloud.spanner_admin_database_v1 import Database
 

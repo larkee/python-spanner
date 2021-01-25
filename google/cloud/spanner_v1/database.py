@@ -109,12 +109,12 @@ class Database(object):
     _spanner_api = None
 
     def __init__(
-            self,
-            database_id,
-            instance,
-            ddl_statements=(),
-            pool=None,
-            encryption_config=None,
+        self,
+        database_id,
+        instance,
+        ddl_statements=(),
+        pool=None,
+        encryption_config=None,
     ):
         self.database_id = database_id
         self._instance = instance
